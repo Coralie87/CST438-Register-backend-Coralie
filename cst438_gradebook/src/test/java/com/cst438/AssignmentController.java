@@ -1,63 +1,118 @@
 package com.cst438;
 
-@RestController
-@RequestMapping("/assignments")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import com.cst438.domain.Assignment;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@SpringBootTest
+@AutoConfigureMockMvc
 public class AssignmentController {
 
-    private List<Assignment> assignments = new ArrayList<>(); // Une liste de devoirs simulée
+    @Autowired
+    private MockMvc mvc;
 
-    // Endpoint pour ajouter un devoir
-    @PostMapping("/")
-    public ResponseEntity<String> addAssignment(@RequestBody Assignment assignment) {
-        // Simule l'ajout du devoir à la liste
-        assignments.add(assignment);
-        return ResponseEntity.ok("Devoir ajouté avec succès");
+    @Test
+    public void testGetAllAssignments() throws Exception {
+        MockHttpServletResponse response;
+
+        response = mvc.perform(
+                MockMvcRequestBuilders
+                        .get("/assignments")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        assertEquals(200, response.getStatus());
+
+        // Assurez-vous que la réponse contient des attributions
+        // Vous devrez ajuster cela en fonction de votre logique réelle.
+        // Assignment[] assignments = fromJsonString(response.getContentAsString(), Assignment[].class);
+        // assertNotNull(assignments);
     }
 
-    // Endpoint pour mettre à jour un devoir
-    @PutMapping("/{assignmentId}")
-    public ResponseEntity<String> updateAssignment(@PathVariable Long assignmentId, @RequestBody Assignment assignment) {
-        // Recherchez le devoir par ID (simplifié pour cet exemple)
-        Optional<Assignment> existingAssignment = assignments.stream()
-                .filter(a -> a.getId().equals(assignmentId))
-                .findFirst();
+    @Test
+    public void testAddAssignment() throws Exception {
+        MockHttpServletResponse response;
 
-        if (existingAssignment.isPresent()) {
-            // Mettez à jour le devoir (simplifié pour cet exemple)
-            Assignment updatedAssignment = existingAssignment.get();
-            updatedAssignment.setName(assignment.getName());
-            return ResponseEntity.ok("Devoir mis à jour avec succès");
-        } else {
-            return ResponseEntity.notFound().build();
+        Assignment assignment = new Assignment();
+        assignment.setName("Database Assignment");
+        assignment.setDescription("Create a database schema");
+        assignment.setInstructorId(1);
+
+        response = mvc.perform(
+                MockMvcRequestBuilders
+                        .post("/assignments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(assignment))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        assertEquals(200, response.getStatus());
+
+        // Assurez-vous que la réponse contient l'attribution créée
+        // Vous devrez ajuster cela en fonction de votre logique réelle.
+        // Assignment result = fromJsonString(response.getContentAsString(), Assignment.class);
+        // assertNotNull(result);
+        // assertNotNull(result.getId());
+    }
+
+    @Test
+    public void testUpdateAssignment() throws Exception {
+        MockHttpServletResponse response;
+
+        int assignmentId = 1;
+        Assignment updatedAssignment = new Assignment();
+        updatedAssignment.setName("Updated Assignment Name");
+
+        response = mvc.perform(
+                MockMvcRequestBuilders
+                        .put("/assignments/" + assignmentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(updatedAssignment))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        assertEquals(200, response.getStatus());
+
+        // Assurez-vous que la réponse contient l'attribution mise à jour
+        // Vous devrez ajuster cela en fonction de votre logique réelle.
+        // Assignment result = fromJsonString(response.getContentAsString(), Assignment.class);
+        // assertNotNull(result);
+    }
+
+    @Test
+    public void testDeleteAssignment() throws Exception {
+        MockHttpServletResponse response;
+
+        int assignmentId = 1;
+
+        response = mvc.perform(
+                MockMvcRequestBuilders
+                        .delete("/assignments/" + assignmentId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        assertEquals(204, response.getStatus());
+    }
+
+    private static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    // Endpoint pour supprimer un devoir
-    @DeleteMapping("/{assignmentId}")
-    public ResponseEntity<String> deleteAssignment(@PathVariable Long assignmentId, @RequestParam(required = false) boolean force) {
-        // Recherchez le devoir par ID (simplifié pour cet exemple)
-        Optional<Assignment> existingAssignment = assignments.stream()
-                .filter(a -> a.getId().equals(assignmentId))
-                .findFirst();
-
-        if (existingAssignment.isPresent()) {
-            Assignment assignmentToDelete = existingAssignment.get();
-
-            if (!force && assignmentToDelete.hasGrades()) {
-                return ResponseEntity.badRequest().body("Le devoir a des notes. Utilisez le paramètre FORCE pour forcer la suppression.");
-            }
-
-            // Supprimez le devoir (simplifié pour cet exemple)
-            assignments.remove(assignmentToDelete);
-            return ResponseEntity.ok("Devoir supprimé avec succès");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    
     }
 
-    // Endpoint pour répertorier tous les devoirs
-    @GetMapping("/")
-    public ResponseEntity<List<Assignment>> listAssignments() {
-        return ResponseEntity.ok(assignments);
-    }
-}

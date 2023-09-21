@@ -25,6 +25,12 @@ public class Assignment {
     private String name;
     private Date dueDate;
     
+    
+    private String description; // Ajout de la description
+   
+    private int instructorId; // Ajout de l'instructorId
+    
+    
     public int getId() {
         return id;
     }
@@ -50,6 +56,23 @@ public class Assignment {
     public void setCourse(Course course) {
         this.course = course;
     }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public int getInstructorId() {
+        return instructorId;
+    }
+    
+    public void setInstructorId(int instructorId) {
+        this.instructorId = instructorId;
+    }
+
     
     public void updateFromDTO(AssignmentDTO assignmentDTO) {
         // Vérifiez si le nom de l'assignment est fourni dans le DTO
