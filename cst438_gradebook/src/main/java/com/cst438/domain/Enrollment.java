@@ -10,71 +10,75 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-
 @Entity
 public class Enrollment {
-	
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
-	
-	private String studentName;
-	private String studentEmail;
-	
-	@ManyToOne
-	@JoinColumn(name="course_id")
-	private Course course;
-	
-	@OneToMany(mappedBy="studentEnrollment")
-	List<AssignmentGrade> assignmentGrades;
 
-	public int getId() {
-		return id;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    private String studentName;
+    private String studentEmail;
 
-	public String getStudentName() {
-		return studentName;
-	}
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
 
-	public void setStudentName(String studentName) {
-		this.studentName = studentName;
-	}
+    @OneToMany(mappedBy = "studentEnrollment")
+    List<AssignmentGrade> assignmentGrades;
 
-	public String getStudentEmail() {
-		return studentEmail;
-	}
+//    //public Enrollment(String studentEmail, int courseId) {
+//        this.studentEmail = studentEmail;
+//        this.course = new Course(); // Initialize the Course object properly, or fetch it from the database if available.
+//    }
+    
+    public Enrollment() {
+    	
+    }
 
-	public void setStudentEmail(String studentEmail) {
-		this.studentEmail = studentEmail;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public Course getCourse() {
-		return course;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setCourse(Course course) {
-		this.course = course;
-	}
-	
+    public String getStudentName() {
+        return studentName;
+    }
 
-	public List<AssignmentGrade> getAssignmentGrades() {
-		return assignmentGrades;
-	}
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
 
-	public void setAssignmentGrades(List<AssignmentGrade> assignmentGrades) {
-		this.assignmentGrades = assignmentGrades;
-	}
+    public String getStudentEmail() {
+        return studentEmail;
+    }
 
-	@Override
-	public String toString() {
-		return "Enrollment [id=" + id + ", studentName=" + studentName + ", studentEmail=" + studentEmail + ", course="
-				+ course + "]";
-	}
+    public void setStudentEmail(String studentEmail) {
+        this.studentEmail = studentEmail;
+    }
 
-	
-	
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public List<AssignmentGrade> getAssignmentGrades() {
+        return assignmentGrades;
+    }
+
+    public void setAssignmentGrades(List<AssignmentGrade> assignmentGrades) {
+        this.assignmentGrades = assignmentGrades;
+    }
+
+    @Override
+    public String toString() {
+        return "Enrollment [id=" + id + ", studentName=" + studentName + ", studentEmail=" + studentEmail + ", course="
+                + course + "]";
+    }
 }
