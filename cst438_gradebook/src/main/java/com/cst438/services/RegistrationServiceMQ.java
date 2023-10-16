@@ -41,13 +41,22 @@ public class RegistrationServiceMQ implements RegistrationService {
 	 * Receive message for student added to course
 	 */
 	@RabbitListener(queues = "gradebook-queue")
-	@Transactional
-	public void receive(String message) {
-		
-		System.out.println("Gradebook has received: "+message);
+    @Transactional
+    public void receive(String message) {
+        System.out.println("Gradebook has received: " + message);
 
-		//TODO  deserialize message to EnrollmentDTO and update database
-	}
+        try {
+            // Deserialize the message to EnrollmentDTO
+            EnrollmentDTO enrollmentDTO = fromJsonString(message, EnrollmentDTO.class);
+
+            // Update the database with the enrollmentDTO data
+            enrollmentRepository.save(enrollmentDTO.toEnrollment());
+
+            System.out.println("Enrollment updated in the database.");
+        } catch (Exception e) {
+            System.err.println("Error deserializing and updating the database: " + e.getMessage());
+        }
+    }
 
 	/*
 	 * Send final grades to Registration Service 
@@ -57,7 +66,10 @@ public class RegistrationServiceMQ implements RegistrationService {
 		 
 		System.out.println("Start sendFinalGrades "+course_id);
 
-		//TODO convert grades to JSON string and send to registration service
+		String gradesJson = asJsonString(grades);
+
+	    // Envoyer la chaîne JSON au service d'inscription
+	    rabbitTemplate.convertAndSend(registrationQueue.getName(), gradesJson);
 		
 	}
 	
